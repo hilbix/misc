@@ -2,7 +2,7 @@
 
 CFLAGS=-Wall -O3
 
-PROGS=udp
+PROGS=udp ipof
 
 all:	$(PROGS)
 
