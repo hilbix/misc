@@ -12,7 +12,7 @@ $(SLIB).so:	$(SLIB).o
 
 $(SLIB).o: Makefile
 
-install:
+install: $(SLIB).so
 	cp -f $(SLIB).so /usr/local/lib/
 
 clean:
