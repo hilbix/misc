@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -28,15 +29,28 @@ void
 _init(void)
 {
   const char *addr;
+  unsigned port;
 
   _bind	= dlwrap("bind");
 
   addr = getenv("FORCE_LOCAL_ADDR");
   if (!addr)
     addr = "127.0.0.1";
-  
-  _any.sin_addr.s_addr = htonl(INADDR_ANY);
   _saddr.sin_addr.s_addr = inet_addr(addr);
+  
+  port = strtoul(getenv("FORCE_LOCAL_PORT"), NULL, 0);
+  if (port)
+    _saddr.sin_port = htons(port);
+
+  addr = getenv("FORCE_LOCAL_FROM_ADDR");
+  if (!addr || !*addr || *addr!='*')
+    _any.sin_addr.s_addr = htonl(INADDR_ANY);
+  else
+    _any.sin_addr.s_addr = inet_addr(addr);
+
+  port = strtoul(getenv("FORCE_LOCAL_FROM_PORT"), NULL, 0);
+  if (port)
+    _any.sin_port = htons(port);
 }
 
 #define SAIN(x) ((struct sockaddr_in *)(x))
@@ -44,8 +58,15 @@ _init(void)
 int
 bind(int fd, const struct sockaddr *ptr, socklen_t len)
 {
-  if (SAIN(ptr)->sin_family==AF_INET && SAIN(ptr)->sin_addr.s_addr==_any.sin_addr.s_addr)
-    SAIN(ptr)->sin_addr.s_addr = _saddr.sin_addr.s_addr;
+  if (SAIN(ptr)->sin_family==AF_INET
+      && SAIN(ptr)->sin_addr.s_addr==_any.sin_addr.s_addr
+      && ( _any.sin_port && SAIN(ptr)->sin_port == _any.sin_port )
+     )
+    {
+      SAIN(ptr)->sin_addr.s_addr = _saddr.sin_addr.s_addr;
+      if (_saddr.sin_port)
+        SAIN(ptr)->sin_port = _saddr.sin_port;
+    }
   return _bind(fd, ptr, len);
 }
 
