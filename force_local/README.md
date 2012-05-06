@@ -47,15 +47,15 @@ The downside of this is that you must run VBoxHeadless as root to get this fixed
 
 echo "udp_outgoing_address 127.255.255.254" >> /etc/init.d/squid.conf
 
-mv -i /usr/local/squid /usr/local/squid.orig
+mv -i /usr/sbin/squid /usr/sbin/squid.orig
 
-cat > /usr/local/squid <<"EOF"
+cat > /usr/sbin/squid <<"EOF"
 export FORCE_LOCAL_FROM_ADDR=127.255.255.254
 export FORCE_LOCAL_PORT=65535
 export LD_PRELOAD=/path/to/force_local.so
 /usr/sbin/squid.orig "$@"
 EOF
-chmod +x /usr/local/squid
+chmod +x /usr/sbin/squid
 
 /etc/init.d/squid start
 ```
