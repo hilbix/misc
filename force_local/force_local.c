@@ -25,6 +25,20 @@ dlwrap(const char *fn)
   return p;
 }
 
+static unsigned
+getport(const char *env)
+{
+  const char *s;
+  char *end;
+  unsigned long port;
+
+  s = getenv(env);
+  if (!s)
+    return 0;
+  port = strtoul(s, &end, 0);
+  return !end || *end || port>65535u ? 0 : port;
+}
+
 void
 _init(void)
 {
@@ -38,7 +52,7 @@ _init(void)
     addr = "127.0.0.1";
   _saddr.sin_addr.s_addr = inet_addr(addr);
   
-  port = strtoul(getenv("FORCE_LOCAL_PORT"), NULL, 0);
+  port = getport("FORCE_LOCAL_PORT");
   if (port)
     _saddr.sin_port = htons(port);
 
@@ -48,7 +62,7 @@ _init(void)
   else
     _any.sin_addr.s_addr = inet_addr(addr);
 
-  port = strtoul(getenv("FORCE_LOCAL_FROM_PORT"), NULL, 0);
+  port = getport("FORCE_LOCAL_FROM_PORT");
   if (port)
     _any.sin_port = htons(port);
 }
