@@ -57,7 +57,7 @@ _init(void)
     _saddr.sin_port = htons(port);
 
   addr = getenv("FORCE_LOCAL_FROM_ADDR");
-  if (!addr || !*addr || *addr!='*')
+  if (!addr || !*addr || *addr=='*')
     _any.sin_addr.s_addr = htonl(INADDR_ANY);
   else
     _any.sin_addr.s_addr = inet_addr(addr);
@@ -74,7 +74,7 @@ bind(int fd, const struct sockaddr *ptr, socklen_t len)
 {
   if (SAIN(ptr)->sin_family==AF_INET
       && SAIN(ptr)->sin_addr.s_addr==_any.sin_addr.s_addr
-      && ( _any.sin_port && SAIN(ptr)->sin_port == _any.sin_port )
+      && ( !_any.sin_port || SAIN(ptr)->sin_port == _any.sin_port )
      )
     {
       SAIN(ptr)->sin_addr.s_addr = _saddr.sin_addr.s_addr;
