@@ -31,7 +31,7 @@ FORCE_LOCAL_FROM_PORT=0
 Example:
 --------
 
-*Make VBoxHeadless listen on localhost*
+**Make VBoxHeadless listen on localhost**
 
 Set FORCE_LOCAL_ADDR if you want a different address than 127.0.0.1.
 
@@ -40,7 +40,9 @@ LD_PRELOAD=/usr/local/lib/force_local.so /usr/lib/virtualbox/VBoxHeadless --star
 ```
 The downside of this is that you must run VBoxHeadless as root to get this fixed as it is suid root.
 
-*Fix SQUID listening on random port*
+**Fix SQUID listening on random port**
+
+See also http://permalink.de/tino/squid
 
 ```bash
 /etc/init.d/squid stop
