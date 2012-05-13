@@ -3,18 +3,21 @@
 
 CFLAGS=-Wall -O3 -D_GNU_SOURCE -fPIC
 
-SLIB=force_local
+SLIB=force_local.so force_bind.so
+OBJS=$(SLIB:.so=.o)
 
-all:	$(SLIB).so
+all:	$(SLIB)
 
-$(SLIB).so:	$(SLIB).o
-	gcc -o $(SLIB).so -nostartfiles -shared $(SLIB).o -ldl
+.SUFFIXES: .so
 
-$(SLIB).o: Makefile
+.o.so:
+	gcc -o $@ -nostartfiles -shared $< -ldl
 
-install: $(SLIB).so
-	cp -f $(SLIB).so /usr/local/lib/
+$(OBJS): Makefile
+
+install: $(SLIB)
+	cp -f $(SLIB) /usr/local/lib/
 
 clean:
-	rm -f *.so *.o *~
+	rm -f $(SLIB) $(OBJS) *~
 
