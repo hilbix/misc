@@ -61,6 +61,7 @@ See also http://permalink.de/tino/squid
 ```bash
 mkdir -p /usr/sbin/orig
 cat > /usr/sbin/orig/squid.wrapper <<"EOF"
+#!/bin/bash
 export FORCE_LOCAL_FROM_ADDR=127.255.255.254
 export FORCE_LOCAL_PORT=65535
 export LD_PRELOAD=/usr/local/lib/force_local.so
@@ -85,6 +86,7 @@ Rsyslogd does not bind to a specific UDP port if talking to another syslogd.  Th
 ```bash
 mkdir -p /usr/sbin/orig
 cat > /usr/sbin/orig/rsyslogd.wrapper <<"EOF"
+#!/bin/bash
 export FORCE_BIND_ADDR=\*
 export FORCE_BIND_PORT=65534
 export LD_PRELOAD=/usr/local/lib/force_bind.so
