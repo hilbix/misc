@@ -11,6 +11,25 @@
 #include <arpa/inet.h>
 #include <dlfcn.h>
 
+#if 0
+#define	DP(X)	debugprintf X
+#include <stdarg.h>
+#include <unistd.h>
+static void
+debugprintf(const char *s, ...)
+{
+  va_list	list;
+  char		buf[4096];
+
+  va_start(list, s);
+  vsnprintf(buf, sizeof buf, s, list);
+  va_end(list);
+  write(-1, buf, strlen(buf));	/* you can see this in strace	*/
+}
+#else
+#define	DP(X)
+#endif
+
 #define SAIN(x) ((struct sockaddr_in *)(x))
 
 static void *

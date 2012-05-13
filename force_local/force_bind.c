@@ -11,6 +11,8 @@ static struct { int domain; int type; int proto; } _sock;
 void
 _init(void)
 {
+  DP(("hello world"));
+
   _socket	= dlwrap("socket");
 
   _sock.domain	= get_u16("FORCE_BIND_SOCKDOM", AF_INET);
@@ -27,7 +29,8 @@ socket(int domain, int type, int protocol)
 {
   int fd;
 
-  fd	= socket(domain, type, protocol);
+  fd	= _socket(domain, type, protocol);
+  DP(("socket(%d,%d,%d) = %d cmp %d %d %d\n", domain, type, protocol, fd, _sock.domain, _sock.type, _sock.proto));
   if (fd<0)
     return fd;
   if (_sock.domain == domain && _sock.type == type && _sock.proto == protocol)

@@ -21,7 +21,7 @@ Environment:
 
 These are the default environment settings used:
 ```
-LD_PRELOAD=/path/to/force_local.so
+LD_PRELOAD=/usr/local/lib/force_local.so
 FORCE_LOCAL_ADDR=127.0.0.1
 FORCE_LOCAL_PORT=0
 FORCE_LOCAL_FROM_ADDR='*'
@@ -32,7 +32,7 @@ FORCE_LOCAL_FROM_PORT=0
 
 
 ```
-LD_PRELOAD=/path/to/force_bind.so
+LD_PRELOAD=/usr/local/lib/force_bind.so
 FORCE_BIND_ADDR=127.0.0.1
 FORCE_BIND_PORT=0
 FORCE_BIND_SOCKDOM=2		# PF_INET/AF_INET
@@ -59,20 +59,21 @@ The downside of this is that you must run VBoxHeadless as root to get this fixed
 See also http://permalink.de/tino/squid
 
 ```bash
-cat > /usr/sbin/squid.wrapper <<"EOF"
+mkdir -p /usr/sbin/orig
+cat > /usr/sbin/orig/squid.wrapper <<"EOF"
 export FORCE_LOCAL_FROM_ADDR=127.255.255.254
 export FORCE_LOCAL_PORT=65535
 export LD_PRELOAD=/usr/local/lib/force_local.so
-exec /usr/sbin/squid.orig "$@"
+exec /usr/sbin/orig/squid "$@"
 EOF
+chmod +x /usr/sbin/orig/squid.wrapper
 
 /etc/init.d/squid stop
 
 echo "udp_outgoing_address 127.255.255.254" >> /etc/init.d/squid.conf
 
-chmod +x /usr/sbin/squid.wrapper
-mv -i /usr/sbin/squid /usr/sbin/squid.orig
-ln -s squid.wrapper /usr/sbin/squid
+mv -i /usr/sbin/squid /usr/sbin/orig/
+ln -s orig/squid.wrapper /usr/sbin/squid
 
 /etc/init.d/squid start
 ```
@@ -82,18 +83,19 @@ ln -s squid.wrapper /usr/sbin/squid
 Rsyslogd does not bind to a specific UDP port if talking to another syslogd.  This is bad in a firewalled environment, as you want to have a static communication matrix such that you can add a static ACL on the dedicated firewall.  This here fixes it:
 
 ```bash
-cat > /usr/sbin/rsyslogd.wrapper <<"EOF"
+mkdir -p /usr/sbin/orig
+cat > /usr/sbin/orig/rsyslogd.wrapper <<"EOF"
 export FORCE_BIND_ADDR=\*
 export FORCE_BIND_PORT=65534
 export LD_PRELOAD=/usr/local/lib/force_bind.so
-exec /usr/sbin/rsyslogd.orig "$@"
+exec /usr/sbin/orig/rsyslogd "$@"
 EOF
+chmod +x /usr/sbin/orig/rsyslogd.wrapper
 
 /etc/init.d/rsyslogd stop
 
-chmod +x /usr/sbin/rsyslogd.wrapper
-mv -i /usr/sbin/rsyslogd /usr/sbin/rsyslogd.orig
-ln -s rsyslogd.wrapper /usr/sbin/rsyslogd
+mv -i /usr/sbin/rsyslogd /usr/sbin/orig/
+ln -s orig/rsyslogd.wrapper /usr/sbin/rsyslogd
 
 /etc/init.d/rsyslogd start
 ```
