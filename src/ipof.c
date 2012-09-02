@@ -17,6 +17,10 @@
 #include <string.h>
 #include <netdb.h>
 #include <errno.h>
+#include <ctype.h>
+
+/* For DIET */
+#include <netinet/in.h>
 
 static int flag_fam = AF_UNSPEC;
 static int flag_all = 0;
@@ -115,11 +119,28 @@ static void
 read_stream(FILE *fd)
 {
   char	buf[1024];
+  int	i;
 
   progress('[');
-  buf[0] = 0;
-  while (fscanf(fd, "%1000s", buf)>0)
-    resolve(buf);
+  for (i = 0;;)
+    {
+      int c;
+
+      c = getc(fd);
+      if (c==EOF || isspace(c) || i>1000)
+        {
+	  if (i)
+	    {
+	      buf[i] = 0;
+	      i	= 0;
+	      resolve(buf);
+	    }
+	  if (c==EOF)
+	    break;
+        }
+      else
+        buf[i++] = c;
+    }
   progress(']');
 }
 
@@ -307,7 +328,11 @@ resolve(const char *host)
 
   memset(&hint, 0, sizeof hint);
   hint.ai_family	= flag_fam;
+#ifdef AI_IDN	/* DIET fix	*/
   hint.ai_flags		= AI_IDN;
+#else
+#warning "IDN not available"
+#endif
 
   progress('.');
   if (getaddrinfo(host, "1", &hint, &ret))

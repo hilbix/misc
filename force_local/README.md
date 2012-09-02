@@ -1,7 +1,7 @@
 Force Local
 ===========
 
-Force a program to listen to localhost (force_locel).  Force a program to bin to a port (force_bind).
+Force a program to listen to localhost (force_local).  Force a program to bind to a specific port (force_bind).
 
 Note that these wrappers are not meant to be perfect.  They are meant to be adjusted to your needs.
 Use the source, it's free, as in free speech, free beer and free men.
@@ -42,8 +42,8 @@ FORCE_BIND_SOCKPROTO=17		# IPPROTO_UDP, see /etc/protocols
 - You can find the constants via `grep IPPROTO_UDP /usr/include/*/*.h`
 
 
-Example:
---------
+Examples:
+---------
 
 **Make VBoxHeadless listen on localhost**
 

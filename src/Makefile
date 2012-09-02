@@ -1,13 +1,23 @@
 # Miscellaneous experiments
 
 CFLAGS=-Wall -O3
+STATICFLAGS=-Wall
 
 PROGS=udp ipof
+STATICS=ipof.static
+INSTALLS=ipof
+INSTALLPREFIX=/usr/local
 
-all:	$(PROGS)
+all:	$(PROGS) $(STATICS)
 
-install:	ipof
-	cp $< /usr/local/bin/
+install:	$(INSTALLS)
+	cp $< $(INSTALLPREFIX)/bin/
+
+.SUFFIXES: .static
+.c.static:
+	@echo ===== Please ignore the warning about printf =====
+	diet -v -Os cc $(STATICFLAGS) $< -o $@
+	strip -s $@
 
 clean:
-	rm -f *.o *~ $(PROGS)
+	rm -f *.o *~ $(PROGS) $(STATICS)
