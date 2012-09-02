@@ -3,7 +3,7 @@ Quick'n'dirty sources
 
 - udp.c is just a stub for an UDP sender, nothing spectacular, perhaps even too simple to be useful.
 
-- ipof.c see below, with `make static` it currently is without IDN
+- ipof.c see below, `ipof.static` currently is without IDN (International Domain Names) support
 
 
 IPOF
