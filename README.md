@@ -2,8 +2,8 @@ Miscellaneous experiments
 
 If not noted otherwise in the sources, it is CLL.
 
-Particuliar recipes:
---------------------
+Recommendations:
+----------------
 
 - force_local/ is a recipe to use LD_PRELOAD to patch programs to listen or bind to fixed ports, such that you can apply static firewall rules to them.
 
