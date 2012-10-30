@@ -81,7 +81,7 @@ hog2(int domain, int type, unsigned long from, unsigned long to, struct sockaddr
     return;
 
   sa->sa_family = domain;
-  for (i=from; i<to; i++)
+  for (i=from; i<=to; i++)
     {
       int	s;
 

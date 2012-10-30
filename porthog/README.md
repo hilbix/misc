@@ -21,7 +21,7 @@ Sounds silly and is silly of course.  But I did not get a better idea, except to
 Usage:
 ------
 
-`porthog range[,range...] program` where `range` is `[proto:]port[-port][@ip]` where `proto` is `tu46` by default, which means tcp4, udp4, tcp6 and udp6 alltogether.
+`porthog range[,range...] program [args...]` where `range` is `[proto:]port[-port][@ip]` where `proto` is `tu46` by default, which means tcp4, udp4, tcp6 and udp6 alltogether.
 
 If `porthog` runs out of file descriptors, it `fork()`s to raise the per-process limit.  However there is a slight chance that for some operations the library needs a file descriptor while all are used up.  In this case you have to re-arrange the `range` appropriately.
 

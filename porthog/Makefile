@@ -8,7 +8,7 @@ PROGS=porthog
 all:	$(PROGS)
 
 install: $(PROGS)
-	cp -f $(PROGS) /usr/local/lib/
+	cp -f $(PROGS) /usr/local/sbin/
 
 clean:
 	rm -f $(PROGS) *.o *~
