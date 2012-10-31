@@ -39,6 +39,20 @@ Example:
 
 `sudo strace porthog 1-65535 netstat -natup 2>TRC >NST` tries to open all ports for TCP, UDP, IPv4 and IPv6.  **Warning!** Only try this if you are sure, your machine has enough resources.  This writes around 25MB in the files.
 
+Fixing `rpcbind` involves editing `/etc/init.d/rcbind`, because you cannot wrap the name `/sbin/rpcbind` as `rpcbind` must run under this name which is hardcoded in the script.  The changes are:
+
+* copy `/usr/local/sbin/porthog` to `/sbin/porthog` to make it available before `/usr` is mounted.
+* alter one line as follows:
+
+original:
+```
+    start-stop-daemon --start --quiet --oknodo --exec /sbin/rpcbind -- "$@"
+```
+to:
+```
+    start-stop-daemon --start --quiet --oknodo --exec /sbin/porthog -- u:500-800,802-1023 /sbin/rpcbind "$@"
+```
+
 
 License:
 --------

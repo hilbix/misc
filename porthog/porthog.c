@@ -1,4 +1,6 @@
-/* This Works is placed under the terms of the Copyright Less License,
+/* Allocate port ranges before executing a program.
+ *
+ * This Works is placed under the terms of the Copyright Less License,
  * see file COPYRIGHT.CLL.  USE AT OWN RISK, ABSOLUTELY NO WARRANTY.
  */
 
@@ -199,6 +201,7 @@ main(int argc, char **argv)
 	    {
 	      switch (*range++)
 		{
+		default:	continue;
 		case 't': tcp	= 1; continue;
 		case 'u': udp	= 1; continue;
 		case '4': ipv4	= 1; continue;
