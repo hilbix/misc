@@ -93,6 +93,9 @@ hog2(int domain, int type, unsigned long from, unsigned long to, struct sockaddr
 	  if (errno!=EMFILE)
 	    oops("socket()");
 	  forkme();
+	  s = socket(domain, type, 0);
+	  if (s<0)
+	    oops("socket() even after fork");
 	}
       ((struct sockaddr_in *)sa)->sin_port = htons(i);
       if (bind(s, sa, len))
