@@ -5,6 +5,8 @@ Quick'n'dirty sources
 
 - ipof.c see below, `ipof.static` currently is without IDN (International Domain Names) support
 
+- printresugid.c just prints the real, effective and saved UID and GID.  Can be used for SUID experiments.
+
 
 IPOF
 ----

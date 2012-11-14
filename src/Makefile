@@ -3,15 +3,15 @@
 CFLAGS=-Wall -O3
 STATICFLAGS=-Wall
 
-PROGS=udp ipof
+PROGS=udp ipof  printresugid
 STATICS=ipof.static
-INSTALLS=ipof
+INSTALLS=ipof printresugid
 INSTALLPREFIX=/usr/local
 
 all:	$(PROGS) $(STATICS)
 
 install:	$(INSTALLS)
-	cp $< $(INSTALLPREFIX)/bin/
+	cp $(INSTALLS) $(INSTALLPREFIX)/bin/
 
 .SUFFIXES: .static
 .c.static:
