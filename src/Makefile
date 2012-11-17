@@ -3,7 +3,7 @@
 CFLAGS=-Wall -O3
 STATICFLAGS=-Wall
 
-PROGS=udp ipof
+PROGS=udp ipof gethostname
 STATICS=ipof.static
 INSTALLS=ipof
 INSTALLPREFIX=/usr/local
