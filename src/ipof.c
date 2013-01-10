@@ -19,6 +19,8 @@
 #include <errno.h>
 #include <ctype.h>
 
+#include <arpa/inet.h>
+
 /* For DIET */
 #include <netinet/in.h>
 
@@ -32,6 +34,8 @@ static int flag_progress = 0;
 static int flag_ext = 0;
 static int flag_dupes = 0;
 static int flag_eoo = 0;
+static int flag_full = 0;
+static int flag_line = 0;
 
 static void
 flush(FILE *fd)
@@ -76,39 +80,43 @@ out(char c)
     putchar(c);
 }
 
+#define SIN4(X)	((struct sockaddr_in *)(X))
+#define SIN6(X)	((struct sockaddr_in6 *)(X))
+
+/* This is correct according to RFC 5952 */
 static void
-p4(struct sockaddr_in *sa)
+pn(struct sockaddr *sa, socklen_t len)
+{
+  char buf[42];
+
+  getnameinfo(sa, len, buf, sizeof buf, NULL, (size_t)0, NI_NUMERICHOST|NI_NUMERICSERV);
+  printf("%s", buf);
+}
+
+/* Output ASCII sortable address	*/
+static void
+p4(struct sockaddr_in *sa, socklen_t len)
 {
   unsigned char *s;
 
   s	= (unsigned char *)&sa->sin_addr.s_addr;
-  printf("%d.%d.%d.%d", s[0], s[1], s[2], s[3]);
+  printf("%03d.%03d.%03d.%03d", s[0], s[1], s[2], s[3]);
 }
 
+/* Output ASCII sortable address	*/
 static void
-p6(struct sockaddr_in6 *sa)
+p6(struct sockaddr_in6 *sa, socklen_t len)
 {
   unsigned char *s;
-  int		i, nulls;
+  char		*sep;
+  int		i;
 
   s	= sa->sin6_addr.s6_addr;
-  nulls	= -1;
+  sep	= "";
   for (i=0; i<16; i+=2)
     {
-      if (nulls>0 || s[i] || s[i+1])
-	{
-	  if (i && nulls)
-	    putchar(':');
-	  printf("%x", (((unsigned)s[i])<<8)|s[i+1]);
-	  if (nulls>0)
-	    nulls++;
-	}
-      else if (nulls<0)
-	{
-	  putchar(':');
-	  putchar(':');
-	  nulls = 0;
-	}
+      printf("%s%04x", sep, (((unsigned)s[i])<<8)|s[i+1]);
+      sep = ":";
     }
 }
 
@@ -213,6 +221,12 @@ struct cmds
     { "0	any address format",	&flag_fam, AF_UNSPEC },
     { "4	IPv4 address format",	&flag_fam, AF_INET },
     { "6	IPv6 address format",	&flag_fam, AF_INET6 },
+    { "f	full sortable address",	&flag_full, 1 },
+    { "m	minimal RFC5952 format", &flag_full, 0 },
+    { "l	line format",		&flag_line, 1 },
+    { "j	join multi on one line", &flag_line, 0 },
+    /* abcdef hij lmnopqrstuv x   01  4 6    -+?	*/
+    /*       g   k           w yz   23 5 789		*/
     { 0 }
   };
 
@@ -304,6 +318,67 @@ getsockfam(int family)
   return typemap(family, sockfam, "family", buf);
 }
 
+/* returns
+ * 0: same address (or both arguments are NULL)
+ * 1: likely the same machine but different port or similar
+ * 2: address differs
+ * 3: different (one argument is NULL)
+ * -1: unknown addressing scheme, differs, may be same, though
+ * -2: different addressing scheme, differs, may be same, though
+ */
+static int
+cmpaddr(const struct sockaddr *a, const struct sockaddr *b, size_t len)
+#if 0
+{
+  int ret;
+
+  ret = cmpaddr2(a,b,len);
+  printf("[%d]", ret);
+  return ret;
+}
+int
+cmpaddr2(const struct sockaddr *a, const struct sockaddr *b, size_t len)
+#endif
+{
+  const void	*p1, *p2;
+  int		cmp;
+
+  if (a==b)
+    return 0;
+  if (!a || !b)
+    return 3;
+  if (a->sa_family != b->sa_family)
+    return -2;
+
+  cmp	= 2;
+  switch (a->sa_family)
+    {
+      default:
+	/* generic	*/
+	p1	= a;
+	p2	= b;
+	cmp	= -1;
+	break;
+
+      case AF_INET:
+	if (SIN4(a)->sin_port != SIN4(b)->sin_port)
+	  return 1;
+	p1	= &SIN4(a)->sin_addr;
+	p2	= &SIN4(b)->sin_addr;
+	len	= sizeof SIN4(a)->sin_addr;
+	break;
+
+      case AF_INET6:
+	if (SIN6(a)->sin6_port != SIN6(b)->sin6_port)
+	  return 1;
+	p1	= &SIN6(a)->sin6_addr;
+	p2	= &SIN6(b)->sin6_addr;
+	len	= sizeof SIN6(a)->sin6_addr;
+	break;
+    }
+  return memcmp(p1, p2, len) ? cmp : 0;
+}
+
 static void
 resolve(const char *host)
 {
@@ -345,7 +420,7 @@ resolve(const char *host)
   last	= 0;
   for (p=ret; p; p=p->ai_next)
     {
-      void	(*fn)(/*(struct sockaddr *)*/);
+      void	(*fn)(/*struct sockaddr *, socklen_t*/);
 
       switch (p->ai_family)
 	{
@@ -365,9 +440,15 @@ resolve(const char *host)
 	  break;
 	
 	}
-      if (!flag_dupes && last && last->ai_addrlen==p->ai_addrlen && !memcmp(last->ai_addr, p->ai_addr, p->ai_addrlen))
+      if (!flag_dupes && last && last->ai_addrlen==p->ai_addrlen && !cmpaddr(last->ai_addr, p->ai_addr, p->ai_addrlen))
 	continue;
 
+      if (flag_line)
+	{
+	  if (had)
+	    out('\n');
+	  had = 0;
+	}
       if (had++)
 	out(' ');
       else if (flag_verbose>0)
@@ -377,7 +458,9 @@ resolve(const char *host)
 	{
 	  if (flag_ext)
 	    printf("<%s,%s,%s>", getsockfam(p->ai_family), getsocktype(p->ai_socktype), getproto(p->ai_protocol));
-	  fn(p->ai_addr);
+	  if (!flag_full)
+	    fn = pn;
+	  fn(p->ai_addr, p->ai_addrlen);
 	  if (flag_ext && p->ai_canonname)
 	    printf("\"%s\"", p->ai_canonname);
 	}
