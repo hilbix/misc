@@ -25,3 +25,8 @@ Examples:
 
 - `ipof -v -f -l -a -- hostname` outputs all IP addresses of the given hostname
 
+Notes
+-----
+
+There can be a bug in dietlibc, which makes `ipof.static` enter an endless loop in case `/etc/resolv.conf` contains irregular characters like `_` (underscore) in the `search` or `domain` string.  These irregular entries can happen in any `DHCP` setup easily.  The bug is in the routine `__dns_readstartfiles` of `dietlibc`.  This bug combined with some forged `DHCP` packets this gives us a DoS.  The nonstatic version is not affected.
+

@@ -1,6 +1,6 @@
 # Miscellaneous experiments
 
-CFLAGS=-Wall -O3
+CFLAGS=-Wall -O3 -g
 STATICFLAGS=-Wall
 
 PROGS=udp ipof gethostname printresugid
@@ -17,7 +17,8 @@ install:	$(INSTALLS)
 .c.static:
 	@echo ===== Please ignore the warning about printf =====
 	diet -v -Os cc $(STATICFLAGS) $< -o $@
+	cp $@ $@.debug
 	strip -s $@
 
 clean:
-	rm -f *.o *~ $(PROGS) $(STATICS)
+	rm -f *.o *~ $(PROGS) $(STATICS) *.debug
