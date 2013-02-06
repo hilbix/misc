@@ -1,6 +1,6 @@
 Miscellaneous experiments
 
-If not noted otherwise in the sources, it is CLL.
+If not noted otherwise in the sources, it is [CLL](http://permalink.de/tino/cll), see [COPYRIGHT.CLL](COPYRIGHT.CLL).
 
 Recommendations:
 ----------------
