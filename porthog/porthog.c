@@ -20,6 +20,7 @@
 static struct sockaddr_in	h4;
 static struct sockaddr_in6	h6;
 static int			maxfd;
+static int			ipv4, ipv6;
 
 static void
 oops(const char *call)
@@ -135,13 +136,22 @@ hog(int type, char *range, struct sockaddr_in *h4, struct sockaddr_in6 *h6)
 }
 
 static void
-sethost(const char *h)
+sethost(const char *host, int fam)
 {
-  struct addrinfo *ai, *a;
+  struct addrinfo *ai, *a, q;
+ 
+  q.ai_flags = 0;
+  q.ai_family = fam;
+  q.ai_socktype = 0;
+  q.ai_protocol = 0;
+  q.ai_addrlen = 0;
+  q.ai_addr = 0;
+  q.ai_canonname = 0;
+  q.ai_next = 0;
 
-  if (getaddrinfo(h, NULL, NULL, &ai))
+  if (getaddrinfo(host, "1", &q, &ai))
     {
-      perror(h);
+      perror("getaddrinfo failed");
       exit(1);
     }
   for (a=ai; a; a=a->ai_next)
@@ -151,8 +161,8 @@ sethost(const char *h)
       switch (a->ai_family)
 	{
 	default:	continue;
-	case AF_INET:	t	= &h4; break;
-	case AF_INET6:	t	= &h6; break;
+	case AF_INET:	t	= &h4; ipv4=1; break;
+	case AF_INET6:	t	= &h6; ipv6=1; break;
 	}
 #if 0
       printf("%d %s %ld\n", a->ai_family, h, (long)a->ai_addrlen);
@@ -166,7 +176,7 @@ int
 main(int argc, char **argv)
 {
   char	*range;
-  int	tcp, udp, ipv4, ipv6;
+  int	tcp, udp;
 
   if (argc<3)
     {
@@ -180,11 +190,14 @@ main(int argc, char **argv)
   maxfd	= 0;
   tcp	= 1;
   udp	= 1;
-  ipv4	= 1;
-  ipv6	= 1;
 
-  sethost("127.0.0.1");
-  sethost("::1");
+  sethost(NULL, AF_INET);
+  sethost(NULL, AF_INET6);
+
+  if (!ipv4)
+    perror("ipv4-porthoghost missing");
+  if (!ipv6)
+    perror("ipv6-porthoghost missing");
 
   while ((range=strtok(argv[1], ","))!=0)
     {
@@ -194,7 +207,7 @@ main(int argc, char **argv)
       if ((p=strchr(range,'@'))!=0)
 	{
 	  *p = 0;
-	  sethost(p+1);
+	  sethost(p+1, AF_UNSPEC);
 	}
       if ((p=strchr(range,':'))!=0)
 	{
