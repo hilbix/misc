@@ -191,13 +191,12 @@ main(int argc, char **argv)
   tcp	= 1;
   udp	= 1;
 
-  sethost(NULL, AF_INET);
-  sethost(NULL, AF_INET6);
+  sethost(NULL, AF_UNSPEC);
 
   if (!ipv4)
-    perror("ipv4-porthoghost missing");
+    perror("ipv4 not available");
   if (!ipv6)
-    perror("ipv6-porthoghost missing");
+    perror("ipv6 not available");
 
   while ((range=strtok(argv[1], ","))!=0)
     {
