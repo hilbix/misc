@@ -85,7 +85,7 @@ main(int argc, char **argv)
       /* getpwuid returns some reused buffer, so we need strdup() here */
     }
   strxcat(buf, sizeof buf, PW(NOTNULL(getpwuid(geteuid())))->pw_dir, "/.runsh/", LOGNAME, ".runsh", NULL);
-  execl("/bin/sh", LOGNAME, buf, NULL);
+  execl("/bin/sh", LOGNAME, "-lc", buf, NULL);
   oops(buf);
   return 127;
 }
