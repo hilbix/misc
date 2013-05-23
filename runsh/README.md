@@ -12,8 +12,8 @@ Usage:
 ```bash
 sudo apt-get install dietlibc-dev
 
-git clone https://github.com/hilbix/runsh.git
-cd runsh
+git clone https://github.com/hilbix/misc.git
+cd misc/runsh
 make
 sudo make install
 
@@ -38,6 +38,7 @@ Note:
 You probably don't want to use `root`, instead some more restricted user and sudo.  Do what you want, but don't blame me if it breaks.  You have been warned.
 
 `runsh` supports SUID.  In that case it uses `$HOME/.runsh/` from the effective user (the one it is set to be SUID).  LOGNAME must be set to some user which maps to the user id or the effective user id, else it takes the (first found) name of the calling user id.
+
 
 Rationale:
 ----------
