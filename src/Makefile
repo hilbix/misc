@@ -3,7 +3,8 @@
 CFLAGS=-Wall -O3 -g
 STATICFLAGS=-Wall
 
-PROGS=udp ipof gethostname printresugid
+PROGS=udp ipof gethostname printresugid checknul
+LDLIBS=-lrt	# for checknul
 STATICS=ipof.static
 INSTALLS=ipof printresugid
 INSTALLPREFIX=/usr/local

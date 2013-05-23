@@ -7,7 +7,9 @@ Quick'n'dirty sources
 
 - `gethostname` calls gethostname(2), in contrast to `hostname` which uses `uname(2)`
 
-- `printresugid.c` just prints the real, effective and saved UID and GID.  Can be used for SUID experiments.
+- `printresugid` just prints the real, effective and saved UID and GID.  Can be used for SUID experiments.
+
+- `checknul.c` is an recipe how to do AIO to allow processing while data is read in.  As example processing it lists NUL sectors in a file or device.
 
 
 IPOF
@@ -24,6 +26,7 @@ Examples:
 - `ipof -q -t -- hostname` returns the status if hostname can be resolved, no output at all
 
 - `ipof -v -f -l -a -- hostname` outputs all IP addresses of the given hostname
+
 
 Notes
 -----

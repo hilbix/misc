@@ -4,3 +4,4 @@ ipof.static
 ipof.static.debug
 gethostname
 printresugid
+checknul
