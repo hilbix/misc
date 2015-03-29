@@ -17,10 +17,16 @@
 #include <netdb.h>
 #include <netinet/in.h>
 
+#include <poll.h>
+#include <fcntl.h>
+
 static struct sockaddr_in	h4;
 static struct sockaddr_in6	h6;
 static int			maxfd;
 static int			ipv4, ipv6;
+static struct pollfd		*polls;
+static int			npolls;
+static int			forks;
 
 static void
 oops(const char *call)
@@ -32,7 +38,8 @@ oops(const char *call)
 static void
 myclose(int fd)
 {
-  while (close(fd) && errno==EINTR);
+  if (fd>=0)
+    while (close(fd) && errno==EINTR);
 }
 
 static void
@@ -42,6 +49,35 @@ closeall(void)
     myclose(maxfd--);
 }
 
+static void __inline__ IGNORE_RETURN_VALUE(){}	/* make GCC happy	*/
+
+static void
+poller(void)
+{
+  int n, i;
+  struct pollfd *p;
+
+  if ((n=poll(polls, npolls, -1))<0)
+    {
+      if (errno==EINTR)
+        return;
+      oops("poll");
+    }
+  /* Just discard everything	*/
+  for (p=polls, i=npolls; n && --i>=0; p->revents=0, p++)
+    if (p->revents==POLLIN)
+      {
+        char buf[BUFSIZ];
+  
+        myclose(accept(p->fd, NULL, NULL));
+        IGNORE_RETURN_VALUE(read(p->fd, buf, sizeof buf));
+        n--;
+      }
+}
+
+/* This also circumvent ulimit and the like.
+ * Sorry, this routine is magic and intransparent.
+ */
 static void
 forkme(void)
 {
@@ -50,7 +86,8 @@ forkme(void)
 
   if ((child=fork())==0)
     {
-      closeall();
+      closeall();	/* magic	*/
+      npolls = 0;	/* intransparent	*/
       return;
     }
   if (child==(pid_t)-1)
@@ -60,7 +97,10 @@ forkme(void)
     {
       pid_t p;
 
-      p = waitpid((pid_t)-1, &status, 0);
+      if (!forks)
+	poller();	/* intransparent	*/
+
+      p = waitpid((pid_t)-1, &status, forks /*magic*/ ? 0 : WNOHANG);
       if (p==(pid_t)-1)
 	oops("waitpid()");
 
@@ -93,7 +133,7 @@ hog2(int domain, int type, unsigned long from, unsigned long to, struct sockaddr
 	{
 	  if (errno!=EMFILE)
 	    oops("socket()");
-	  forkme();
+	  forkme();	/* circumvent ulimit	*/
 	  s = socket(domain, type, 0);
 	  if (s<0)
 	    oops("socket() even after fork");
@@ -107,6 +147,24 @@ hog2(int domain, int type, unsigned long from, unsigned long to, struct sockaddr
       listen(s,1);
       if (s>maxfd)
 	maxfd	= s;
+      if (!forks)
+	{
+          struct pollfd *p;
+
+	  fcntl(s, F_SETFL, fcntl(s, F_GETFL, 0) | O_NONBLOCK);
+
+#define	INCPOLLS	256	/* power of 2	*/
+	  if (!polls)
+	    polls	= malloc(INCPOLLS * sizeof *polls);
+          else if (!(npolls&(INCPOLLS-1)))
+	    polls	= realloc(polls, (npolls+INCPOLLS) * sizeof *polls);
+	  if (!polls)
+	    oops("OOM");
+	  p		= &polls[npolls++];
+	  p->fd		= s;
+	  p->events	= POLLIN;
+	  p->revents	= 0;
+	}
     }
 }
 
@@ -172,6 +230,21 @@ sethost(const char *host, int fam)
   freeaddrinfo(ai);
 }
 
+static void get_children_dummy_handler() {}
+
+static void
+get_children(void)
+{
+  struct sigaction sa;
+
+  sa.sa_handler = &get_children_dummy_handler;
+  sa.sa_flags = 0;
+  sigfillset(&sa.sa_mask);
+  if (sigaction(SIGCHLD, &sa, NULL))
+    oops("sigaction");
+}
+
+
 int
 main(int argc, char **argv)
 {
@@ -182,11 +255,15 @@ main(int argc, char **argv)
     {
       fprintf(stderr, "Usage: %s range[,range...] program [args...]\n"
 		"\trange is [proto:]port[-port][@ip], proto defaults to 'tu46'\n"
-		"\t\twhich stands for: tcp, udp, ipv4 and ipv6\n"
+		"\t\twhich stands for: tcp, udp, ipv4 and ipv6.\n"
+		"\tIf program is '-' then it sits on the socktets until killed.\n"
 		, argv[0]);
       return 2;		/* resemble shell	*/
     }
 
+  get_children();
+
+  forks	= argc>3 || strcmp(argv[2], "-");
   maxfd	= 0;
   tcp	= 1;
   udp	= 1;
@@ -237,6 +314,9 @@ main(int argc, char **argv)
       if (tcp)
 	hog(SOCK_STREAM, range, ipv4 ? &h4 : NULL, ipv6 ? &h6 : NULL);
     }
+
+  if (!forks)
+    poller();
 
   forkme();
 

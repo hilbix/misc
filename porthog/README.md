@@ -13,7 +13,7 @@ This time it is difficult to fix the syscall, as it could come in an unknown seq
 FIX: Allocate all ports which must not be used
 ----------------------------------------------
 
-`porthog` allocates ranges of UDP ports on a given IP (by default 127.0.0.2) and forks a program.  Afterwards it closes the ports again.
+`porthog` allocates ranges of UDP ports on a given IP (by default loopback for IPv4 and IPv6) and forks a program.  Afterwards it closes the ports again.
 
 Sounds silly and is silly of course.  But I did not get a better idea, except to replace the `bindresvport_sa()` routine of libirpc via `LD_PRELOAD`.
 
@@ -24,6 +24,8 @@ Usage:
 `porthog range[,range...] program [args...]` where `range` is `[proto:]port[-port][@ip]` where `proto` is `tu46` by default, which means tcp4, udp4, tcp6 and udp6 alltogether.
 
 If `porthog` runs out of file descriptors, it `fork()`s to raise the per-process limit.  However there is a slight chance that for some operations the library needs a file descriptor while all are used up.  In this case you have to re-arrange the `range` appropriately.
+
+If program is `-` (just a dash) then porthog hogs on the port until killed by some means.  If data arrives on the ports it is silently discarded and connections are actively rejected.
 
 
 Bugs:
