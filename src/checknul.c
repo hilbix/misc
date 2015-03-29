@@ -17,6 +17,10 @@
 #include <malloc.h>
 #include <aio.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #define	SECTOR	512
 #define	SECTORS	40960
 #define	BUFFERLEN	(SECTOR*SECTORS)
