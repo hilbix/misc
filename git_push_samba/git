@@ -1,0 +1,16 @@
+#!/bin/bash
+#MAGIC# THIS IS git_push_samba WRAPPER
+
+run() { LD_PRELOAD="${1:-$(dirname "$0")}/git_push_samba.so" exec "${@:2}"; }
+dry() { [ -x "$1" ] && run '' "$@"; }
+# the '' above is set on "make install"
+
+# Assume you want to run your git if installed (it was renamed to git.orig on "make install")
+# If not, then run the local git if installed
+# Else run the system installed git
+dry "$HOME/bin/git.orig" "$@"
+dry /usr/local/bin/git "$@"
+dry /usr/bin/git "$@"
+echo "git not found" >&2
+exit 23
+

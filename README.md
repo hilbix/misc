@@ -15,3 +15,5 @@ Recommendations:
 
 - `runsh/` allows to run scripts directly from the login prompt.  Convenient for laptops to switch different access profiles quickly.  Risky for machines with `ssh` access, use `PermitEmptyPasswords` wisely or try `rssh`.  `runsh` supports SUID, too.
 
+- `git_push_samba` is a workaround for http://superuser.com/q/681196 (`git` fails on certain POSIX violating filesystems)
+
