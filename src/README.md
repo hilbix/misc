@@ -1,15 +1,18 @@
 Quick'n'dirty sources
 =====================
 
-- `udp.c` is just a stub for an UDP sender, nothing spectacular, perhaps even too simple to be useful.
+- `udp` is just a stub for an UDP sender, nothing spectacular, perhaps even too simple to be useful.
 
-- `ipof.c` see below, `ipof.static` currently is without IDN (International Domain Names) support
+- `ipof` see below, `ipof.static` currently is without IDN (International Domain Names) support
 
 - `gethostname` calls gethostname(2), in contrast to `hostname` which uses `uname(2)`
 
 - `printresugid` just prints the real, effective and saved UID and GID.  Can be used for SUID experiments.
 
-- `checknul.c` is an recipe how to do AIO to allow processing while data is read in.  As example processing it lists NUL sectors in a file or device.
+- `checknul` is an recipe how to do AIO to allow processing while data is read in.  As example processing it lists NUL sectors in a file or device.
+
+- `umount2-l` unconditionally call `umount2()` with flags `MNT_DETACH` (similar to `/sbin/umount -l`) and `UMOUNT_NOFOLLOW` (to not accidentally umount softlinks).
+  This is for cases where `umount -l` hangs forever (due to a forever blocking/hung `lstat()` call)
 
 
 IPOF

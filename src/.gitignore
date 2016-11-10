@@ -5,3 +5,4 @@ ipof.static.debug
 gethostname
 printresugid
 checknul
+umount2-l

@@ -3,7 +3,7 @@
 CFLAGS=-Wall -O3 -g
 STATICFLAGS=-Wall
 
-PROGS=udp ipof gethostname printresugid checknul
+PROGS=udp ipof gethostname printresugid checknul umount2-l
 LDLIBS=-lrt	# for checknul
 STATICS=ipof.static
 INSTALLS=ipof printresugid
