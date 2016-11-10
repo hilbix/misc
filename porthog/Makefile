@@ -5,11 +5,14 @@ CFLAGS=-Wall -O3 -D_GNU_SOURCE
 
 PROGS=porthog
 
+.PHONY: all
 all:	$(PROGS)
 
+.PHONY: install
 install: $(PROGS)
 	cp -f $(PROGS) /usr/local/sbin/
 
-clean:
+.PHONY: clean distclean
+clean distclean:
 	rm -f $(PROGS) *.o *~
 

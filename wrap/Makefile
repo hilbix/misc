@@ -7,8 +7,10 @@ PROGS=wrap
 WRAPS=VBoxHeadless.wrap.dist
 INSTPATH=/wrap
 
+.PHONY: all
 all:	$(PROGS)
 
+.PHONY: install
 install: $(PROGS)
 	mkdir -p $(INSTPATH)
 	strip -s $(PROGS)
@@ -20,6 +22,7 @@ example: $(WRAPS)
 	chown --reference /usr/lib/virtualbox/VBoxHeadless $(INSTPATH)/VBoxHeadless
 	chmod --reference /usr/lib/virtualbox/VBoxHeadless $(INSTPATH)/VBoxHeadless
 
-clean:
+.PHONY: clean distclean
+clean distclean:
 	rm -f $(PROGS) *.o *~
 

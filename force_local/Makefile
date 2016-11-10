@@ -6,6 +6,7 @@ CFLAGS=-Wall -O3 -D_GNU_SOURCE -fPIC
 SLIB=force_local.so force_bind.so
 OBJS=$(SLIB:.so=.o)
 
+.PHONY: all
 all:	$(SLIB)
 
 .SUFFIXES: .so
@@ -15,9 +16,11 @@ all:	$(SLIB)
 
 $(OBJS): Makefile
 
+.PHONY: install
 install: $(SLIB)
 	cp -f $(SLIB) /usr/local/lib/
 
-clean:
+.PHONY: clean distclean
+clean distclean:
 	rm -f $(SLIB) $(OBJS) *~
 

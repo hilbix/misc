@@ -9,8 +9,10 @@ STATICS=ipof.static
 INSTALLS=ipof printresugid
 INSTALLPREFIX=/usr/local
 
+.PHONY: all
 all:	$(PROGS) $(STATICS)
 
+.PHONY: install
 install:	$(INSTALLS)
 	cp $(INSTALLS) $(INSTALLPREFIX)/bin/
 
@@ -21,5 +23,6 @@ install:	$(INSTALLS)
 	cp $@ $@.debug
 	strip -s $@
 
-clean:
+.PHONY: clean distclean
+clean distclean:
 	rm -f *.o *~ $(PROGS) $(STATICS) *.debug
