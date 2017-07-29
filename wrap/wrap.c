@@ -66,7 +66,7 @@ main(int argc, char **argv)
       *ptr++ = 0;
       if (last && *last)
 	{
-#if 1
+#if 0
 	  write(1, last, strlen(last)); write(1, "\r\n", 2);
 #endif
           putenv(last);
