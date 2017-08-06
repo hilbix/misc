@@ -14,6 +14,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+static void IGUR() {}
+
 static void
 oops(const char *call)
 {
@@ -75,8 +77,8 @@ main(int argc, char **argv)
     }
 
   /* Apply the effective uid/gid	*/
-  setuid(geteuid());
-  setgid(getegid());
+  IGUR(setuid(geteuid()));
+  IGUR(setgid(getegid()));
 
   /* execute the wrapped binary	*/
   argv[0] = buf;
