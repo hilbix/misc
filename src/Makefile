@@ -3,10 +3,10 @@
 CFLAGS=-Wall -O3 -g
 STATICFLAGS=-Wall
 
-PROGS=udp ipof gethostname printresugid checknul umount2-l fs_ioc_fiemap
+INSTALLS=ipof gethostname printresugid checknul umount2-l fs_ioc_fiemap
+PROGS=udp $(INSTALLS)
 LDLIBS=-lrt	# for checknul
 STATICS=ipof.static
-INSTALLS=ipof printresugid
 INSTALLPREFIX=/usr/local
 
 .PHONY: all
