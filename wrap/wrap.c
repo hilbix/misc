@@ -77,8 +77,9 @@ main(int argc, char **argv)
     }
 
   /* Apply the effective uid/gid	*/
-  IGUR(setuid(geteuid()));
   IGUR(setgid(getegid()));
+  /* gid first, as after uid has changed it usually is impossible */
+  IGUR(setuid(geteuid()));
 
   /* execute the wrapped binary	*/
   argv[0] = buf;
