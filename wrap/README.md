@@ -3,11 +3,13 @@ SUID root wrapper
 
 Environment mapper for SUID root programs.
 
+For a bit more generic program, see [`suid`](https://github.com/hilbix/suid)
+
 
 Example:
 ----------
 
-LD_PRELOAD does not work with SUID root programs because it is too dangerous for such a thing.  Therefor to apply fixes like ../force_local/ to SUID root programs like VBoxManage you need a helper.  `wrap` does exactly this.
+`LD_PRELOAD` does not work with SUID root programs because it is too dangerous for such a thing.  Therefor to apply fixes like `../force_local/` to SUID root programs like VBoxManage you need a helper.  `wrap` does exactly this.
 
 Instead invoking something like
 ```
