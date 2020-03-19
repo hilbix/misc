@@ -7,6 +7,7 @@ SUBS=	\
 	runsh	\
 	src	\
 	wrap	\
+	openssl	\
 
 .PHONY: all clean distclean
 all clean distclean:
