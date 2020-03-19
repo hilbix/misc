@@ -25,3 +25,5 @@ If not noted otherwise in the sources, it is [CLL](http://permalink.de/tino/cll)
 - `wrap/` is a wrapper to alter the environment of SUID programms and installs to `/wrap/` - it can be used to apply `force_local/` fixes to SUID programs.
   - [`suid`](https://github.com/hilbix/suid/) is a far better successor to this.
 
+- [`openssl/`](openssl/)  OpenSSL sucks.  Period.  It even sucks more, than a pure vacuum can.  Exclemationmark!
+
