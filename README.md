@@ -1,8 +1,10 @@
-Miscellaneous experiments
+[![misc Build Status](https://api.cirrus-ci.com/github/hilbix/misc.svg?branch=master)](https://cirrus-ci.com/github/hilbix/misc/master)
+
+# Miscellaneous experiments
 
 If not noted otherwise in the sources, it is [CLL](http://permalink.de/tino/cll), see [COPYRIGHT.CLL](COPYRIGHT.CLL).
 
-# Overview
+## Overview
 
 - `force_local/` is a recipe to use `LD_PRELOAD` to patch programs to listen or bind to fixed ports, such that you can apply static firewall rules to them.
 
