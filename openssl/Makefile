@@ -14,7 +14,7 @@ all:	$(PROGS) $(STATICS)
 
 .PHONY: install
 install:	$(INSTALLS)
-	cp $(INSTALLS) $(INSTALLPREFIX)/bin/
+	for a in $(INSTALLS); do cmp -s "$$a" "$(INSTALLPREFIX)/bin/$$a" || cp --backup=t -f "$$a" "$(INSTALLPREFIX)/bin/"; done
 
 .SUFFIXES: .static
 .c.static:
