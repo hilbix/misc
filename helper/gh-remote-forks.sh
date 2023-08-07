@@ -8,8 +8,8 @@
 # This Works is placed under the terms of the Copyright Less License,
 # see file COPYRIGHT.CLL.  USE AT OWN RISK, ABSOLUTELY NO WARRANTY.
 
-CACHE="$(which unbuffered md5sum >/dev/null 2>&1 && which cached.sh)"
-[ -n "$CACHE" ] || printf 'Running uncached\n' >&2
+CACHED="$(which unbuffered md5sum >/dev/null 2>&1 && which cached.sh)"
+[ -n "$CACHED" ] || printf 'Running uncached\n' >&2
 
 # Escape any string into ASCII only using
 # A-Za-z0-9_-
@@ -49,7 +49,7 @@ clr()
 {
   {
   printf '\r'
-  printf '%q ' "$@"
+  [ 0 = $# ] || printf '%q ' "$@"
   printf '%s' "$clr"
   } >&2
 }
@@ -81,7 +81,7 @@ remote-name()
 add-remote-fork()
 {
   remote-name name "$1"
-  git remote get-url "$name" 2>/dev/null && continue
+  git remote get-url "$name" >/dev/null 2>/dev/null && return
   printf 'add %q\n' "$1"
   git remote add "$name" "https://github.com/$1.git"
 #  git remote set-url	"github-$name" "https://github.com/$1.git"
@@ -96,4 +96,6 @@ map gh-repo-source-fullname |
 sort -u |
 map gh-repo-forks |
 map add-remote-fork
+
+clr
 
