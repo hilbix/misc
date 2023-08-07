@@ -5,7 +5,7 @@ Quick'n'dirty sources
 
 - `ipof` see below, `ipof.static` currently is without IDN (International Domain Names) support
 
-- `gethostname` calls gethostname(2), in contrast to `hostname` which uses `uname(2)`
+- `gethostname` calls `gethostname(2)`, in contrast to `hostname` which uses `uname(2)`
 
 - `printresugid` just prints the real, effective and saved UID and GID.  Can be used for SUID experiments.
 
@@ -13,6 +13,8 @@ Quick'n'dirty sources
 
 - `umount2-l` unconditionally call `umount2()` with flags `MNT_DETACH` (similar to `/sbin/umount -l`) and `UMOUNT_NOFOLLOW` (to not accidentally umount softlinks).
   This is for cases where `umount -l` hangs forever (due to a forever blocking/hung `lstat()` call)
+
+- `fs_ioc_fiemap` lists the fragments of a file with the `ioctl(FS_IOC_FIEMAP)`
 
 
 IPOF
