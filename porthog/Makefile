@@ -10,7 +10,7 @@ all:	$(PROGS)
 
 .PHONY: install
 install: $(PROGS)
-	cp -f $(PROGS) /usr/local/sbin/
+	for a in $(PROGS); do cmp -s "$$a" "/usr/local/bin/$$a" || cp --backup=t -f "$$a" /usr/local/bin/; done
 
 .PHONY: clean distclean
 clean distclean:
