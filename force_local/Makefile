@@ -18,7 +18,7 @@ $(OBJS): Makefile
 
 .PHONY: install
 install: $(SLIB)
-	cp -f $(SLIB) /usr/local/lib/
+	for a in $(SLIB); do cmp -s "$$a" "/usr/local/lib/$$a" || cp -f "$$a" /usr/local/lib/; done
 
 .PHONY: clean distclean
 clean distclean:
