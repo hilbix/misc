@@ -35,12 +35,15 @@ MD5="${MD5%% *}"
 PREF="$DIR/${MD5:0:3}"
 OUT="$PREF/$MD5"
 
-OOPS() { { printf 'OOPS:'; printf ' %q' "$@"; printf '\n'; } >&2; exit 23; }
+STDERR() { { printf %q "$1"; printf ' %q' "${@:2}"; printf '\n'; } >&2; }
+OOPS() { STDERR OOPS: "$@"; exit 23; }
 x() { "$@"; }
 o() { x "$@" || OOPS exec $?: "$@"; }
 i() { local e=$?; "$@"; return $e; }
 
 [ -n "$*" ] || OOPS Usage: "$0" command args..
+
+DEBUG() { [ -z "$CACHED_DEBUG" ] || STDERR CACHED: "$@"; }
 
 o mkdir -pm700 "$PREF"
 exec 6>>"$OUT.cmd" || OOPS exec "6>>$OUT.cmd"
@@ -69,25 +72,24 @@ then
 	cached=false
 fi
 
-$cached ||
-if	# unbufferd (as invoked this way):
-	# - forks the command ("$@"),
-	# - catches the command's stderr (-i2) and outputs this to stdout,
-	# - also writes command's stderr to "$OUT.err" (-a"$OUT.err"),
-	# - forwards command's stdout to stderr (due to -i2)
-	# - and finally returns the command's return status.
-	# stdout (command's stderr) then is sent to stderr again
-	# while stderr (command's stdout) is written to $OUT.tmp
-	# Also the lock file descriptor 6 is not exposed to the command.
-	# Any questions? Yes: How to do this with pure shell, please? ;)
-	unbuffered -i2 -a"$OUT.err" -- "$@" >&2 2>"$OUT.tmp" 6<&-
+# Output file and drop lock after opening the file
+$cached && i DEBUG cached: "$@" && exec cat <"$OUT.out" 6<&-
+
+# unbufferd (as invoked this way):
+# - forks the command ("$@"),
+# - inner catches the command's stderr (-i2) to $OUT.err
+# - inner forwards command's stdout to stderr (due to -i2)
+# - outer catches the command's stdin  (-i2) to $OUT.tmp
+# - and finally both return the command's return status.
+# Also the lock file descriptor 6 is not exposed to the command.
+# Any questions? Yes: How to do this with pure shell, please? ;)
+if	unbuffered -i2 -a"$OUT.tmp" unbuffered -i2 -a"$OUT.err" -- "$@" 6<&-
 then
 	o mv -f "$OUT.tmp" "$OUT.out"
+	i DEBUG cache ok: "$@"
 else
+	i DEBUG cache fail $?: "$@"
 	i rm -f "$OUT.tmp"	# throw away newly cached data
-	exit	# thanks to i() $? still is what came from the command
 fi
-
-# Output file and drop lock after opening the file
-exec cat <"$OUT.out" 6<&-
+exit	# thanks to i() $? still is what came from the command
 
