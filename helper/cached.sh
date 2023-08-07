@@ -1,9 +1,7 @@
 #!/bin/bash
 #
 # Cache output of commands (producers)
-# THIS NEEDS SOME OTHER TOOLS FROM
-# https://github.com/hilbix/src
-# (md5chk 0.7.0 / unbuffered v1.1.0)
+# THIS NEEDS https://github.com/hilbix/unbuffered
 #
 # Instead
 #	producer args.. | ..
@@ -41,6 +39,8 @@ OOPS() { { printf 'OOPS:'; printf ' %q' "$@"; printf '\n'; } >&2; exit 23; }
 x() { "$@"; }
 o() { x "$@" || OOPS exec $?: "$@"; }
 i() { local e=$?; "$@"; return $e; }
+
+[ -n "$*" ] || OOPS Usage: "$0" command args..
 
 o mkdir -pm700 "$PREF"
 exec 6>>"$OUT.cmd" || OOPS exec "6>>$OUT.cmd"
