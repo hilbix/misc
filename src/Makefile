@@ -3,8 +3,9 @@
 CFLAGS=-Wall -O3 -g
 STATICFLAGS=-Wall
 
-INSTALLS=ipof gethostname printresugid checknul umount2-l fs_ioc_fiemap
-PROGS=udp $(INSTALLS)
+SRCS=$(wildcard *.c)
+PROGS=$(SRCS:.c=)
+
 LDLIBS=-lrt	# for checknul
 STATICS=ipof.static
 INSTALLPREFIX=/usr/local
@@ -13,8 +14,8 @@ INSTALLPREFIX=/usr/local
 all:	$(PROGS) $(STATICS)
 
 .PHONY: install
-install:	$(INSTALLS)
-	cp $(INSTALLS) $(INSTALLPREFIX)/bin/
+install:	$(PROGS)
+	for a in $(PROGS); do cmp -s "$$a" "$(INSTALLPREFIX)/bin/$$a" || cp --backup=t -f "$$a" "$(INSTALLPREFIX)/bin/"; done
 
 .SUFFIXES: .static
 .c.static:
