@@ -14,7 +14,7 @@ all:	$(PROGS)
 install: $(PROGS)
 	mkdir -p $(INSTPATH)
 	strip -s $(PROGS)
-	cp -f $(PROGS) $(WRAPS) $(INSTPATH)/
+	for a in $(PROGS) $(WRAPS); do cmp -s "$$a" "$(INSTPATH)/$$a" || cp -f "$$a" "$(INSTPATH)/"; done
 
 example: $(WRAPS)
 	-echo n | ln -is VBoxHeadless.wrap.dist $(INSTPATH)/VBoxHeadless.wrap
