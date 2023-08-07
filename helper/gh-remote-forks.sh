@@ -9,6 +9,7 @@
 # see file COPYRIGHT.CLL.  USE AT OWN RISK, ABSOLUTELY NO WARRANTY.
 
 CACHE="$(which unbuffered md5sum >/dev/null 2>&1 && which cached.sh)"
+[ -n "$CACHE" ] || printf 'Running uncached\n' >&2
 
 # Escape any string into ASCII only using
 # A-Za-z0-9_-
