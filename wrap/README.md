@@ -19,10 +19,14 @@ you do following:
 
 - Create directory `/wrap`
 - Create a copy of `./wrap` to `/wrap/VBoxHeadless`
+  - hardlinks work, too
 - Set the permissions and owner of `/wrap/VBoxHeadless` to exactly the same as `/usr/lib/virtualbox/VBoxHeadless`
 - Create a textfile named `/wrap/VBoxHeadless.wrap`
 - The first line of `/wrap/VBoxHeadless.wrap` reads `/usr/lib/virtualbox/VBoxHeadless`
 - The following lines of this files contain the environment to add to the called program.  In this case `LD_PRELOAD=/usr/local/lib/force_local.so`
+  - The lines cannot contain NUL bytes, as NUL is considered EOF, too
+  - The lines must be full lines including the `LF`
+  - This is for safety.  If a file is truncated/damaged, NUL bytes might show up, which invalidates the current line
 
 You then can call `/wrap/VBoxHeadless` instead of `LD_PRELOAD=/usr/local/lib/force_local.so /usr/lib/virtualbox/VBoxHeadless`, even from a normal user.
  
