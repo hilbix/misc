@@ -13,8 +13,9 @@ all:	$(BINS)
 .PHONY: install
 install:
 	strip -s $(BINS)
-	cp $(BINS) $(PREFIX)$(SBINDIR)
+	for a in $(BINS); do cmp -s "$$a" "$(PREFIX)/bin/$$a" || cp --backup=t -f "$$a" "$(PREFIX)/bin/"; done
 
 .PHONY: clean distclean
 clean distclean:
 	rm -f *.o *~ $(BINS)
+
