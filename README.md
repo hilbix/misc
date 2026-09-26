@@ -31,3 +31,5 @@ If not noted otherwise in the sources, it is [CLL](http://permalink.de/tino/cll)
 
 - [`openssl/`](openssl/)  OpenSSL sucks.  Period.  It even sucks more, than a pure vacuum can.  Exclemationmark!
 
+- [`py3`](py3/) contains manually improved Python3 code written by some AI
+  - [`verify-torrent.py`] verifies some torrents
